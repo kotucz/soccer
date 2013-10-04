@@ -17,10 +17,17 @@ public class Ball extends P {
 
     Ball original;
 
+    private Pitch pitch;
+
+    public Ball() {
+        // TODO pitch not initialized so hope it will be not used - only as data object
+    }
+
     /**
      * Creates a new instance of Ball
      */
-    public Ball() {
+    public Ball(Pitch pitch) {
+        this.pitch = pitch;
         reset();
     }
 
@@ -69,7 +76,7 @@ public class Ball extends P {
 
 
     void doHalfMove() {
-        if (!Pitch.ballType) {
+        if (!pitch.ballType) {
             add(vhalf);
 
             if ((x < 0) || (x > Pitch.WIDTH)) {
@@ -79,9 +86,9 @@ public class Ball extends P {
 
                         System.out.println("GOOOOL");
                         if (x > 320) {
-                            Pitch.team1.score++;
+                            pitch.team1.score++;
                         } else {
-                            Pitch.team2.score++;
+                            pitch.team2.score++;
                         }
 
                         Pitch.playSound(Pitch.goalClip);
@@ -114,10 +121,11 @@ public class Ball extends P {
 
                     if (isOriginal()) {
                         System.out.println("GOOOOL");
-                        if (x > Pitch.CENTX)
-                            Pitch.team1.score++;
-                        else
-                            Pitch.team2.score++;
+                        if (x > Pitch.CENTX) {
+                            pitch.team1.score++;
+                        } else {
+                            pitch.team2.score++;
+                        }
                         Pitch.playSound(Pitch.goalClip);
                     }
 
@@ -165,7 +173,7 @@ public class Ball extends P {
     }
 
     public Object clone() {
-        Ball b = new Ball();
+        Ball b = new Ball(pitch);
         b.x = x;
         b.y = y;
         b.vx = b.v_x = v.x;

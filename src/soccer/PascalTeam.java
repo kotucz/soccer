@@ -5,12 +5,19 @@ package soccer;
  */
 public abstract class PascalTeam extends Team {
 
-    public static final int MAX_HRACU = Pitch.numPlayers;
+    public int MAX_HRACU;// = Pitch.numPlayers;
 
     public static final int V_MICE = 10;
     public static final int V_HRACE = 5;
 
-//	public void ui () {
+    @Override
+    void init(Pitch pitch) {
+        super.init(pitch);
+        MAX_HRACU = pitch.numPlayers;
+    }
+
+
+    //	public void ui () {
 //		ui(getPlayers(), getOpponents(), getBall(), (getSide()>0)?1:0);
 ////		does nothing, since pascal is using	public abstract void ui(Player[] plays, Player[] opps, Ball ball, int strana) ;
 ////		calls pascal ui

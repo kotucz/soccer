@@ -25,20 +25,24 @@ public class Pitch {
     public static final int WIDTH = 640;//getWidth();
     public static final int HEIGHT = 480;//getHeight();
 
-    static int numPlayers = 5;
-    static boolean ballType = true;
-
-    static Team team1, team2;
-
-    protected static Ball ball;
-
     static AudioClip kickClip, melodyClip, goalClip;
 
+    int numPlayers = 5;
+    boolean ballType = true;
+
+    Team team1, team2;
+
+    protected Ball ball;
+
     public void newDuel(Team team1, Team team2) {
+        this.team1 = team1;
+        this.team2 = team2;
 
 //		team1 = new Team();
 //		team2 = new Team();
 
+        team1.init(this);
+        team2.init(this);
         team1.setSide(-1);
         team2.setSide(1);
         team1.setTeamColor(Color.RED);
@@ -47,9 +51,8 @@ public class Pitch {
         team2.setTeamColor(Color.GREEN);
         team1.opponents = team2.players;
         team2.opponents = team1.players;
-        Team.pitch = this;
 
-        ball = new Ball();
+        ball = new Ball(this);
         ball.original = ball;
 
         if ("kotuc.AtomTeam".equals(team2.getClass().getName())) {
@@ -72,7 +75,7 @@ public class Pitch {
 
 //	java.util.List<Player> players = new LinkedList();
 
-    public static int getScore(int side) {
+    public int getScore(int side) {
         if (side == -1) {
             return team1.score;
         } else if (side == 1) {

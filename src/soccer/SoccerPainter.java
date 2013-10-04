@@ -15,6 +15,12 @@ public class SoccerPainter {
 
     int delay = 100;
 
+    final Pitch pitch;
+
+    public SoccerPainter(Pitch pitch) {
+        this.pitch = pitch;
+    }
+
     void newDuel() {
         startTime = System.currentTimeMillis();
 
@@ -34,9 +40,9 @@ public class SoccerPainter {
         g.drawRect(580, 160, 60, 160);
         g.drawRect(0, 160, 60, 160);
 
-        Team team1 = Pitch.team1;
-        Team team2 = Pitch.team2;
-        Ball ball = Pitch.ball;
+        Team team1 = pitch.team1;
+        Team team2 = pitch.team2;
+        Ball ball = pitch.ball;
 
         team1.paint(g);
         team2.paint(g);

@@ -7,8 +7,8 @@ import java.awt.*;
  */
 public abstract class Team {
 
-    final Player[] players = new Player[Pitch.numPlayers];
-    Player[] opponents = null;
+    Player[] players;
+    Player[] opponents;
 
     String name;
 
@@ -18,11 +18,14 @@ public abstract class Team {
 
     int score;
 
-    static Pitch pitch;
+    Pitch pitch;
 
-    public Team() {
+    void init(Pitch pitch) {
+        this.pitch = pitch;
 
         name = getClass().getName();
+
+        players = new Player[pitch.numPlayers];
 
         for (int i = 0; i < players.length; i++) {
             players[i] = new Player(i + 1, this);
@@ -120,7 +123,7 @@ public abstract class Team {
 
     public Ball getBall() {
 //        return (Ball)pitch.getBall().clone();
-        return Pitch.ball;
+        return pitch.ball;
     }
 
     final void ui0() {
@@ -193,4 +196,7 @@ public abstract class Team {
     }
 
 
+    public Pitch getPitch() {
+        return pitch;
+    }
 }

@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 public class SoccerApplet extends Applet implements MouseListener, KeyListener, Runnable {
 
     final Pitch pitch = new Pitch();
-    final SoccerPainter painter = new SoccerPainter();
+    final SoccerPainter painter = new SoccerPainter(pitch);
 
     static final String[] teamNames = loadTeamNames();
 
@@ -47,7 +47,7 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
         this.addMouseListener(this);
         this.addKeyListener(this);
 
-        setSize(WIDTH, HEIGHT);
+        setSize(Pitch.WIDTH, Pitch.HEIGHT);
 
         try {
             Pitch.kickClip = getAudioClip(getClass().getResource("/soccer/data/punch.wav"));
