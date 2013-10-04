@@ -1,7 +1,7 @@
 /*
  * Pitch.java
  *
- * Created on 1. bøezen 2007, 21:02
+ * Created on 1. bï¿½ezen 2007, 21:02
  *
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
@@ -446,6 +446,12 @@ implements KeyListener, MouseListener, Runnable {
 
 		
 	}
+
+    static void playSound(AudioClip audioClip) {
+        if (audioClip != null) {
+            audioClip.play();
+        }
+    }
 
 	
 }

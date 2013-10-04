@@ -1,10 +1,8 @@
 /*
  * Ball.java
  *
- * Created on 1. bøezen 2007, 22:58
+ * Created on 1. bï¿½ezen 2007, 22:58
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 
 package soccer;
@@ -12,171 +10,175 @@ package soccer;
 import java.awt.*;
 
 /**
- *
- * @author PC
+ * @author kotucz
  */
 public class Ball extends P {
 
-	/** Creates a new instance of Ball */
-	public Ball() {
-//		this.x = Pitch.WIDTH/2; 
-//		this.y = Pitch.HEIGHT/2;
-		reset();
-	}
+    /**
+     * Creates a new instance of Ball
+     */
+    public Ball() {
+        reset();
+    }
 
-	void reset() {
-		this.x = Pitch.WIDTH/2; 
-		this.y = Pitch.HEIGHT/2;
-	}
+    void reset() {
+        this.x = Pitch.WIDTH / 2;
+        this.y = Pitch.HEIGHT / 2;
+    }
 
-	protected V v = new V();
-	protected V vhalf = new V();
+    protected V v = new V();
+    protected V vhalf = new V();
 
-	public double vx, vy, v_x, v_y;
+    public double vx, vy, v_x, v_y;
 
-	void kick(double vx, double vy) {
-		kick(vx, vy, MAX_SPEED);
-	}
-	
-	void kick(double vx, double vy, double speed) {
+    void kick(double vx, double vy) {
+        kick(vx, vy, MAX_SPEED);
+    }
 
-		this.v.x = vx;
-		this.v.y = vy;
+    void kick(double vx, double vy, double speed) {
 
-		double vl = v.length();
+        this.v.x = vx;
+        this.v.y = vy;
 
-		speed = Math.min(speed, MAX_SPEED);
-		
-		if (vl>speed) {
-			if (isOriginal()) Pitch.kickClip.play();
-			v.scale(speed/(vl));
-		}
+        double vl = v.length();
 
-		this.vx = this.v_x = v.x;
-		this.vy = this.v_y = v.y;   
+        speed = Math.min(speed, MAX_SPEED);
 
-		vhalf = new V(v);
-		vhalf.scale(0.5);
+        if (vl > speed) {
+            if (isOriginal()) {
+                Pitch.playSound(Pitch.kickClip);
+            }
+            v.scale(speed / (vl));
+        }
 
-	}
+        this.vx = this.v_x = v.x;
+        this.vy = this.v_y = v.y;
 
-	protected void paint(Graphics g) {
+        vhalf = new V(v);
+        vhalf.scale(0.5);
 
-		int r=3;
-
-		g.setColor(Color.WHITE);
-		g.fillOval((int)x-r, (int)y-r, 2*r, 2*r);
-
-	}
-
-	public static final int MAX_SPEED = 10;
-
-	void doHalfMove() {
-		if (!Pitch.ballType) {
-			add(vhalf);
-
-			if ((x<0)||(x>Pitch.WIDTH)) {
-				if ((y>160)&&(y<320)) {
-
-					if (isOriginal()) {
-
-						System.out.println("GOOOOL");
-						if (x>320) Pitch.team1.score++;
-						else Pitch.team2.score++;
-
-						Pitch.goalClip.play();
-					}
-
-				}
+    }
 
 
-				kick(-vx, vy);
+    protected void paint(Graphics g) {
+
+        int r = 3;
+
+        g.setColor(Color.WHITE);
+        g.fillOval((int) x - r, (int) y - r, 2 * r, 2 * r);
+
+    }
+
+    public static final int MAX_SPEED = 10;
+
+    void doHalfMove() {
+        if (!Pitch.ballType) {
+            add(vhalf);
+
+            if ((x < 0) || (x > Pitch.WIDTH)) {
+                if ((y > 160) && (y < 320)) {
+
+                    if (isOriginal()) {
+
+                        System.out.println("GOOOOL");
+                        if (x > 320) {
+                            Pitch.team1.score++;
+                        } else {
+                            Pitch.team2.score++;
+                        }
+
+                        Pitch.playSound(Pitch.goalClip);
+                    }
+
+                }
+
+
+                kick(-vx, vy);
 
 //				v.x*=-1;
 //vhalf.x*=-1;
 
-			}
-			
-			if ((y<0)||(y>Pitch.HEIGHT)) {
-				kick(vx, -vy);
+            }
+
+            if ((y < 0) || (y > Pitch.HEIGHT)) {
+                kick(vx, -vy);
 //				v.y*=-1;
 //				vhalf.y*=-1;
-			}
-		} else {
-			add(vhalf);
+            }
+        } else {
+            add(vhalf);
 
-			if ((y<Pitch.TOPY)||(y>Pitch.BOTTOMY)) {
-				kick(0, 0);
-			}
+            if ((y < Pitch.TOPY) || (y > Pitch.BOTTOMY)) {
+                kick(0, 0);
+            }
 
-			if ((x<Pitch.LEFTX)||(x>Pitch.RIGHTX)) {
-				if ((y>160)&&(y<320)) {
+            if ((x < Pitch.LEFTX) || (x > Pitch.RIGHTX)) {
+                if ((y > 160) && (y < 320)) {
 
-					if (isOriginal()) {
-						System.out.println("GOOOOL");
-						if (x>Pitch.CENTX) 
-							Pitch.team1.score++;
-						else
-							Pitch.team2.score++;
-						Pitch.goalClip.play();
-					}
-
-
-					reset();
-
-				}
-
-				kick(0, 0);
-
-			}
-
-			x = Math.min(Math.max(Pitch.LEFTX, x), Pitch.RIGHTX);
-			y = Math.min(Math.max(Pitch.TOPY, y), Pitch.BOTTOMY);
-
-		}
-
-	}
+                    if (isOriginal()) {
+                        System.out.println("GOOOOL");
+                        if (x > Pitch.CENTX)
+                            Pitch.team1.score++;
+                        else
+                            Pitch.team2.score++;
+                        Pitch.playSound(Pitch.goalClip);
+                    }
 
 
-	public void doVMove() {
-		if (isOriginal()) {
-			System.err.println("Illegal use doVMove on original Ball");
-			return;
-		}
-		doHalfMove();
-		doHalfMove();
-	}
+                    reset();
 
-	/**
-	 * @return the velocity
-	 */
-	public V getV() {
-		return new V(v);
-	}
+                }
 
-	/**
-	 * @return the position
-	 */
-	public P getP() {
-		return new P(x, y);
-	}
+                kick(0, 0);
 
-	Ball original;
+            }
 
-	boolean isOriginal() {
-		return (original==this);
-	}
+            x = Math.min(Math.max(Pitch.LEFTX, x), Pitch.RIGHTX);
+            y = Math.min(Math.max(Pitch.TOPY, y), Pitch.BOTTOMY);
 
-	public Object clone() {
-		Ball b = new Ball();
-		b.x = x;
-		b.y = y;
-		b.vx = b.v_x = v.x;
-		b.vy = b.v_y = v.y;   
-		b.v = new V(v);
-		b.vhalf = new V(vhalf);
-		return b;
-	}
+        }
 
+    }
+
+
+    public void doVMove() {
+        if (isOriginal()) {
+            System.err.println("Illegal use doVMove on original Ball");
+            return;
+        }
+        doHalfMove();
+        doHalfMove();
+    }
+
+    /**
+     * @return the velocity
+     */
+    public V getV() {
+        return new V(v);
+    }
+
+    /**
+     * @return the position
+     */
+    public P getP() {
+        return new P(x, y);
+    }
+
+    Ball original;
+
+    boolean isOriginal() {
+        return (original == this);
+    }
+
+    public Object clone() {
+        Ball b = new Ball();
+        b.x = x;
+        b.y = y;
+        b.vx = b.v_x = v.x;
+        b.vy = b.v_y = v.y;
+        b.v = new V(v);
+        b.vhalf = new V(vhalf);
+        return b;
+    }
 
 }
