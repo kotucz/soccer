@@ -1,10 +1,3 @@
-/*
- * Ball.java
- *
- * Created on 1. b�ezen 2007, 22:58
- *
- */
-
 package soccer;
 
 import java.awt.*;
@@ -13,6 +6,16 @@ import java.awt.*;
  * @author kotucz
  */
 public class Ball extends P {
+
+    public static final int MAX_SPEED = 10;
+
+    protected V v = new V();
+
+    protected V vhalf = new V();
+
+    public double vx, vy, v_x, v_y;
+
+    Ball original;
 
     /**
      * Creates a new instance of Ball
@@ -26,10 +29,6 @@ public class Ball extends P {
         this.y = Pitch.HEIGHT / 2;
     }
 
-    protected V v = new V();
-    protected V vhalf = new V();
-
-    public double vx, vy, v_x, v_y;
 
     void kick(double vx, double vy) {
         kick(vx, vy, MAX_SPEED);
@@ -59,7 +58,6 @@ public class Ball extends P {
 
     }
 
-
     protected void paint(Graphics g) {
 
         int r = 3;
@@ -69,7 +67,6 @@ public class Ball extends P {
 
     }
 
-    public static final int MAX_SPEED = 10;
 
     void doHalfMove() {
         if (!Pitch.ballType) {
@@ -140,7 +137,6 @@ public class Ball extends P {
 
     }
 
-
     public void doVMove() {
         if (isOriginal()) {
             System.err.println("Illegal use doVMove on original Ball");
@@ -163,8 +159,6 @@ public class Ball extends P {
     public P getP() {
         return new P(x, y);
     }
-
-    Ball original;
 
     boolean isOriginal() {
         return (original == this);
