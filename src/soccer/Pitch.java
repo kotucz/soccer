@@ -34,8 +34,6 @@ public class Pitch {
 
     static AudioClip kickClip, melodyClip, goalClip;
 
-    static int delay = 100;
-
     public void newDuel(Team team1, Team team2) {
 
 //		team1 = new Team();
@@ -59,9 +57,6 @@ public class Pitch {
 //            addMouseListener((MouseListener) team2);
         }
 
-        startTime = System.currentTimeMillis();
-
-        tick = 0;
 
 //		new Timer().schedule(new RTTask(), 100);
 //new Timer().schedule(new RTTask(), 100, 50);
@@ -105,8 +100,6 @@ public class Pitch {
 
         ball.doHalfMove();
 
-        tick++;
-
 //		for (Player p1:players) {
 
 
@@ -122,11 +115,9 @@ public class Pitch {
 
         if (swap) {
             team2.ui0();
-//		tick++;
             team1.ui0();
         } else {
             team1.ui0();
-//		tick++;
             team2.ui0();
         }
 
@@ -135,52 +126,8 @@ public class Pitch {
         team2.doMoves();
         ball.doHalfMove();
 
-        tick++;
-
     }
 
-    private Font font1 = new Font("Arial", Font.BOLD, 14);
-
-    protected long startTime;
-
-    protected long tick;
-
-    void paintField(Graphics g) {
-//		System.out.println("paintfield");        
-
-
-        g.drawLine(320, 0, 320, 480);
-        g.drawRect(1, 1, WIDTH - 2, HEIGHT - 2);
-
-
-        g.setColor(Color.ORANGE);
-//		g.fillRect(1, 1, width-2, height-2);
-        g.drawRect(580, 160, 60, 160);
-        g.drawRect(0, 160, 60, 160);
-
-
-        team1.paint(g);
-        team2.paint(g);
-        ball.paint(g);
-
-        g.setFont(font1);
-
-        g.setColor(team1.getTeamColor());
-        g.drawString("" + team1.score, 320 + team1.side * 100, 40);
-        g.drawString("" + team1.name, 240 + team1.side * 200, 40);
-
-        g.setColor(team2.getTeamColor());
-        g.drawString("" + team2.score, 320 + team2.side * 100, 40);
-        g.drawString("" + team2.name, 240 + team2.side * 200, 40);
-
-        g.setColor(Color.CYAN);
-
-        g.drawString("time:  " + (System.currentTimeMillis() - startTime) / 60000 + ":" + ((System.currentTimeMillis() - startTime) % 60000) / 100, 50, 60);
-        g.drawString("tick:  " + tick, 50, 80);
-        g.drawString("delay: " + delay, 50, 100);
-
-
-    }
 
     private long benchstart;
 

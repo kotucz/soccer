@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 public class SoccerApplet extends Applet implements MouseListener, KeyListener, Runnable {
 
     final Pitch pitch = new Pitch();
+    final SoccerPainter painter = new SoccerPainter();
 
     static final String[] teamNames = loadTeamNames();
 
@@ -86,7 +87,7 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
     public void flushGraphics() {
 
         BufferedImage bi = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
-        pitch.paintField(bi.getGraphics());
+        painter.paintField(bi.getGraphics());
         imageBuffer = bi;
         repaint();
 
@@ -103,7 +104,7 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
                 break;
             }
 
-            if (pitch.tick == maxTick) {
+            if (painter.tick == maxTick) {
                 break;
             }
 
@@ -112,6 +113,8 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
                 long t = System.currentTimeMillis();
 
                 pitch.doTeamMovesWithRandom();
+
+                painter.tick++;
 
 //				System.out.println("benchmoves: "+bench());
 
@@ -125,7 +128,7 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
 				}
 */
 
-                t = pitch.delay - (System.currentTimeMillis() - t);
+                t = painter.delay - (System.currentTimeMillis() - t);
 
                 if (t > 0)
                     try {
@@ -187,12 +190,12 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
     public void keyReleased(KeyEvent e) {
 //		System.out.println(""+e);
         if ('-' == e.getKeyChar()) {
-            if (Pitch.delay > 1) {
-                Pitch.delay /= 2;
+            if (painter.delay > 1) {
+                painter.delay /= 2;
             }
         }
         if ('+' == e.getKeyChar()) {
-            Pitch.delay *= 2;
+            painter.delay *= 2;
         }
     }
 
@@ -281,6 +284,7 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
             Team team1 = (Team) Class.forName(team1classname).newInstance();
             Team team2 = (Team) Class.forName(team2classname).newInstance();
             pitch.newDuel(team1, team2);
+            painter.newDuel();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
