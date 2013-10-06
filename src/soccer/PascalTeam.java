@@ -1,47 +1,50 @@
 package soccer;
 
+import java.util.Random;
+
 /**
  * Team wrapper to be compatible with in pascal programed AIs.
  */
 public abstract class PascalTeam extends Team {
 
+    public static final Random RANDOM = new Random();
     public int MAX_HRACU;// = Pitch.numPlayers;
 
     public static final int V_MICE = 10;
     public static final int V_HRACE = 5;
 
     @Override
-    void init(Pitch pitch) {
+    final void init(Pitch pitch) {
         super.init(pitch);
         MAX_HRACU = pitch.numPlayers;
+        pitch.
     }
 
-
-    //	public void ui () {
-//		ui(getPlayers(), getOpponents(), getBall(), (getSide()>0)?1:0);
-////		does nothing, since pascal is using	public abstract void ui(Player[] plays, Player[] opps, Ball ball, int strana) ;
-////		calls pascal ui
-//	}
+    public final void ui() {
+//		does nothing, since pascal is using	public abstract void ui(Player[] plays, Player[] opps, Ball ball, int strana) ;
+//		calls pascal ui
+        ui(getPascalPlayers(), getPascalOpponents(), getBall(), (getSide() > 0) ? 1 : 0);
+    }
 
     public abstract void ui(Player[] plays, Player[] opps, Ball ball, int strana);
 
-    public double vzdalenost(double x1, double y1, double x2, double y2) {
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    public final double vzdalenost(double x1, double y1, double x2, double y2) {
+        return Math.hypot(x1 - x2, y1 - y2);
     }
 
-    public int random(int i) {
-        return (int) Math.floor(Math.random() * i);
+    public final int random(int i) {
+        return RANDOM.nextInt(i);
     }
 
-    public int round(double i) {
+    public final int round(double i) {
         return (int) Math.round(i);
     }
 
-    public void jdi_na(Player p, double x, double y) {
+    public final void jdi_na(Player p, double x, double y) {
         if (p != null) p.goTo(x, y);
     }
 
-    public void kopni_mic(Player p, Ball b, double x, double y, double v) {
+    public final void kopni_mic(Player p, Ball b, double x, double y, double v) {
 //		kickBall(x, y);
         if (p.distance(b) < Player.RANGE) b.kick(x - b.x, y - b.y, v);
     }
@@ -52,7 +55,7 @@ public abstract class PascalTeam extends Team {
      * <p/>
      * !not null since null pointer exception is thrown
      */
-    public Player[] getPlayers() {
+    private final Player[] getPascalPlayers() {
         Player[] pls = super.getPlayers();
         Player[] pps = new Player[pls.length + 1];
         pps[0] = new Player();
@@ -66,7 +69,7 @@ public abstract class PascalTeam extends Team {
      * <p/>
      * !not null since null pointer exception is thrown
      */
-    public Player[] getOpponents() {
+    private final Player[] getPascalOpponents() {
         Player[] ops = super.getOpponents();
         Player[] pops = new Player[ops.length + 1];
         pops[0] = new Player();

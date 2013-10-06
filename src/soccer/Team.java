@@ -134,19 +134,7 @@ public abstract class Team {
         }
     }
 
-
-    public void ui(Player[] plays, Player[] opps, Ball ball, int strana) {
-
-    }
-
-//  public abstract void ui() ;
-
-    public void ui() {
-        ui(getPlayers(), getOpponents(), getBall(), (getSide() > 0) ? 1 : 0);
-//		does nothing, since pascal is using	public abstract void ui(Player[] plays, Player[] opps, Ball ball, int strana) ;
-//		calls pascal ui
-    }
-
+    public abstract void ui();
 
     public void kickBall(double bx, double by) {
         for (Player p1 : players) {

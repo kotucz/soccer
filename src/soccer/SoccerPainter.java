@@ -1,12 +1,15 @@
 package soccer;
 
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Kotuc
  */
 public class SoccerPainter {
 
+    public static final SimpleDateFormat RINTIME_FORMAT = new SimpleDateFormat("mm:ss:SSS");
     private Font font1 = new Font("Arial", Font.BOLD, 14);
 
     protected long startTime;
@@ -60,9 +63,10 @@ public class SoccerPainter {
 
         g.setColor(Color.CYAN);
 
-        double runTime = System.currentTimeMillis() - startTime;
+        long runTime = System.currentTimeMillis() - startTime;
 
-        g.drawString("time:  " + runTime / 60000 + ":" + (runTime % 60000) / 100, 50, 60);
+        g.drawString("time:  " + RINTIME_FORMAT.format(new Date(runTime)), 50, 60);
+//        g.drawString("time:  " + runTime / 60000 + ":" + (runTime % 60000) / 100, 50, 60);
         g.drawString("tick:  " + tick, 50, 80);
         g.drawString("delay: " + delay, 50, 100);
 
