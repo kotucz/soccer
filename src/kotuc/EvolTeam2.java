@@ -11,9 +11,6 @@ import java.util.Date;
 
 public class EvolTeam2 extends Team {
 
-    public EvolTeam2() {
-        for (int i = 0; i < configs.length; i++) configs[i] = new WConfig();
-    }
 
     WConfig config = new WConfig();
 
@@ -33,6 +30,12 @@ public class EvolTeam2 extends Team {
     Ball ball;
 
     Player pgo;
+
+    public EvolTeam2() {
+        for (int i = 0; i < configs.length; i++) {
+            configs[i] = new WConfig();
+        }
+    }
 
     public void ui() {
 
@@ -91,8 +94,8 @@ public class EvolTeam2 extends Team {
 
     void updateConfig() {
 
-        config.homescore = getPitch().getScore(side) - lasthome;
-        config.hostscore = getPitch().getScore(-side) - lasthost;
+        config.homescore = getPitch().getScore(getSideEnum()) - lasthome;
+        config.hostscore = getPitch().getScore(getSideEnum().opponent()) - lasthost;
 
         if ((System.currentTimeMillis() - lastUpdate) < updateInterval) return;
 
@@ -183,8 +186,8 @@ public class EvolTeam2 extends Team {
 
         println("SWITCHED TO : " + config.toString());
 
-        lasthome = getPitch().getScore(side);
-        lasthost = getPitch().getScore(-side);
+        lasthome = getPitch().getScore(getSideEnum());
+        lasthost = getPitch().getScore(getSideEnum().opponent());
 
         lastUpdate = System.currentTimeMillis();
     }
@@ -220,7 +223,7 @@ public class EvolTeam2 extends Team {
             }
 
 //			depending on the distance to goal        	
-            qual += config.get(W.agresivity) * Math.pow(Math.max(0, 1 - new P((1 - getSide()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(t1) / 500), config.get(W.agresivityexp));
+            qual += config.get(W.agresivity) * Math.pow(Math.max(0, 1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(t1) / 500), config.get(W.agresivityexp));
 
             if (qual > bestqual) {
                 bestqual = qual;
@@ -278,7 +281,7 @@ public class EvolTeam2 extends Team {
             qual += config.get(W.locstability) * Math.max(0, 500 - p1.distance(l1)) / 500;
 
 //			depending on the distance to goal        	
-            qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSide()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(l1) / 500));
+            qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(l1) / 500));
 
             if (qual > bestq) {
                 bestq = qual;
@@ -361,7 +364,7 @@ public class EvolTeam2 extends Team {
 
         Player pbr = null;
 
-        P gomin = new P(320 + side * 300, 240);
+        P gomin = new P(320 + getSideSign() * 300, 240);
 
         double mindist = 1000;
 

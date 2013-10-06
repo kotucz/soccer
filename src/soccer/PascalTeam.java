@@ -1,13 +1,10 @@
 package soccer;
 
-import java.util.Random;
-
 /**
  * Team wrapper to be compatible with in pascal programed AIs.
  */
 public abstract class PascalTeam extends Team {
 
-    public static final Random RANDOM = new Random();
     public int MAX_HRACU;// = Pitch.numPlayers;
 
     public static final int V_MICE = 10;
@@ -22,7 +19,7 @@ public abstract class PascalTeam extends Team {
     public final void ui() {
 //		does nothing, since pascal is using	public abstract void ui(Player[] plays, Player[] opps, Ball ball, int strana) ;
 //		calls pascal ui
-        ui(getPascalPlayers(), getPascalOpponents(), getBall(), (getSide() > 0) ? 1 : 0);
+        ui(getPascalPlayers(), getPascalOpponents(), getBall(), (getSideSign() > 0) ? 1 : 0);
     }
 
     public abstract void ui(Player[] plays, Player[] opps, Ball ball, int strana);
@@ -32,7 +29,9 @@ public abstract class PascalTeam extends Team {
     }
 
     public final int random(int i) {
-        return RANDOM.nextInt(i);
+        return (int) Math.floor(Math.random() * i);
+//  this implementation causes Exceptions in some AIs
+//        return RANDOM.nextInt(i);
     }
 
     public final int round(double i) {

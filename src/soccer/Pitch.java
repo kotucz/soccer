@@ -40,13 +40,13 @@ public class Pitch {
 //		team1 = new Team();
 //		team2 = new Team();
 
-        final Player[] players1 = createPlayers(team1, -1);
-        final Player[] players2 = createPlayers(team2, 1);
+        final Player[] players1 = createPlayers(team1, Side.LEFT);
+        final Player[] players2 = createPlayers(team2, Side.RIGHT);
 
         team1.init(this, players1, players2);
         team2.init(this, players2, players1);
-        team1.setSide(-1);
-        team2.setSide(1);
+        team1.setSide(Side.LEFT);
+        team2.setSide(Side.RIGHT);
         team1.setTeamColor(Color.RED);
 //		team1.name = "RED Team";
 //		team2.name = "GREEN Team";
@@ -73,18 +73,21 @@ public class Pitch {
         System.out.println("started");
     }
 
-    private Player[] createPlayers(Team team, int side) {
+    private Player[] createPlayers(Team team, Side side) {
         Player[] players = new Player[rules.getNumPlayers()];
 
         for (int i = 0; i < players.length; i++) {
             players[i] = new Player(i + 1, team);
         }
 
+        int sign = side.getSign();
+
         for (Player p1 : players) {
-            p1.x = p1.dx = 320 + side * 100;
+            p1.x = p1.dx = 320 + sign * 100;
             p1.y = p1.dy = 100 + p1.n * 40;
         }
-        players[0].x = players[0].dx = 320 + side * 300;
+        // goal keeper
+        players[0].x = players[0].dx = 320 + sign * 300;
         players[0].y = players[0].dy = 240;
 
         return players;
@@ -92,13 +95,14 @@ public class Pitch {
 
 //	java.util.List<Player> players = new LinkedList();
 
-    public int getScore(int side) {
-        if (side == -1) {
-            return team1.getScore();
-        } else if (side == 1) {
-            return team2.getScore();
-        } else {
-            return -1;
+    public int getScore(Side side) {
+        switch (side) {
+            case LEFT:
+                return team1.getScore();
+            case RIGHT:
+                return team2.getScore();
+            default:
+                throw new IllegalArgumentException("" + side);
         }
     }
 

@@ -20,7 +20,7 @@ public class Duck extends Team {
         players[mini].dx = getBall().x;
         players[mini].dy = getBall().y;
 
-        kickBall((1 - getSide()) * Pitch.WIDTH / 2, Math.random() * Pitch.HEIGHT);
+        kickBall((1 - getSideSign()) * Pitch.WIDTH / 2, Math.random() * Pitch.HEIGHT);
 
 //        for (Player p1:plays) {
 //            if (p1.n==1) {

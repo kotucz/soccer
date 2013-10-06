@@ -24,7 +24,7 @@ public class UI_Koste extends PascalTeam {
 
         a[mini].goTo(getBall().x, getBall().y);
 
-        kickBall((1 - getSide()) * Pitch.WIDTH / 2, Math.random() * Pitch.HEIGHT);
+        kickBall((1 - getSideSign()) * Pitch.WIDTH / 2, Math.random() * Pitch.HEIGHT);
 
 //        for (Player p1:a) {
 //            if (p1.n==1) {

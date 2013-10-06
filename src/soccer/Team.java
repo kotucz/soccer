@@ -15,7 +15,10 @@ public abstract class Team {
 
     private Color teamColor = Color.CYAN;
 
-    protected int side = 0;
+    private int side = 0;
+
+
+    private Side sideEnum;
 
     int score;
 
@@ -32,47 +35,48 @@ public abstract class Team {
 
     }
 
-    void setSide(int side) {
-        this.side = side;
+    void setSide(Side side) {
+        this.side = side.getSign();
+        this.sideEnum = side;
     }
 
     /** Creates a new instance of Team */
  /*   public Team(int s) {
-        
+
     	this();
-    	
+
     	this.side = s;
         if (side>0) teamColor = Color.RED;
         else teamColor = Color.GREEN;
-        
-        
+
+
     }*/
-    
+
 /*    public void run() {
-        
+
         println(this +": redy");
-        
+
         try {
-        
+
                 Thread.sleep(5000);
         } catch (InterruptedException ex) {
                ex.printStackTrace();
         }
 
-        
+
         while (true) {
-            
-                        
-            
+
+
+
                 ui0();
-            
+
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
         }
-        
+
     }
     */
 
@@ -93,7 +97,7 @@ public abstract class Team {
     /**
      * @return the side
      */
-    public int getSide() {
+    public int getSideSign() {
         return side;
     }
 
@@ -101,8 +105,7 @@ public abstract class Team {
         return teamColor;
     }
 
-    protected void doMoves() {
-
+    void doMoves() {
 
         for (Player player : players) {
             player.doMove();
@@ -175,7 +178,6 @@ public abstract class Team {
         this.name = name;
     }
 
-
     public Pitch getPitch() {
         return pitch;
     }
@@ -187,4 +189,9 @@ public abstract class Team {
     public void setRules(Rules rules) {
         this.rules = rules;
     }
+
+    public Side getSideEnum() {
+        return sideEnum;
+    }
+
 }
