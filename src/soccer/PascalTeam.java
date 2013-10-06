@@ -14,10 +14,9 @@ public abstract class PascalTeam extends Team {
     public static final int V_HRACE = 5;
 
     @Override
-    final void init(Pitch pitch) {
-        super.init(pitch);
-        MAX_HRACU = pitch.numPlayers;
-        pitch.
+    public void setRules(Rules rules) {
+        super.setRules(rules);
+        MAX_HRACU = rules.getNumPlayers();
     }
 
     public final void ui() {

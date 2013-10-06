@@ -7,10 +7,11 @@ import java.awt.*;
  */
 public abstract class Team {
 
-    Player[] players;
-    Player[] opponents;
+    private Player[] players;
 
-    String name;
+    private Player[] opponents;
+
+    private String name;
 
     private Color teamColor = Color.CYAN;
 
@@ -18,30 +19,21 @@ public abstract class Team {
 
     int score;
 
-    Pitch pitch;
+    private Pitch pitch;
 
-    void init(Pitch pitch) {
+    private Rules rules;
+
+    void init(Pitch pitch, Player[] players, Player[] opponents) {
         this.pitch = pitch;
-
+        this.players = players;
+        this.opponents = opponents;
+        setRules(pitch.rules);
         name = getClass().getName();
-
-        players = new Player[pitch.numPlayers];
-
-        for (int i = 0; i < players.length; i++) {
-            players[i] = new Player(i + 1, this);
-        }
 
     }
 
     void setSide(int side) {
         this.side = side;
-        for (Player p1 : players) {
-            p1.x = p1.dx = 320 + side * 100;
-            p1.y = p1.dy = 100 + p1.n * 40;
-        }
-        players[0].x = players[0].dx = 320 + side * 300;
-        players[0].y = players[0].dy = 240;
-
     }
 
     /** Creates a new instance of Team */
@@ -186,5 +178,13 @@ public abstract class Team {
 
     public Pitch getPitch() {
         return pitch;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setRules(Rules rules) {
+        this.rules = rules;
     }
 }

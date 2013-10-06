@@ -54,12 +54,12 @@ public class SoccerPainter {
         g.setFont(font1);
 
         g.setColor(team1.getTeamColor());
-        g.drawString("" + team1.score, 320 + team1.side * 100, 40);
-        g.drawString("" + team1.name, 240 + team1.side * 200, 40);
+        g.drawString("" + team1.getScore(), 320 + team1.side * 100, 40);
+        g.drawString("" + team1.getName(), 240 + team1.side * 200, 40);
 
         g.setColor(team2.getTeamColor());
-        g.drawString("" + team2.score, 320 + team2.side * 100, 40);
-        g.drawString("" + team2.name, 240 + team2.side * 200, 40);
+        g.drawString("" + team2.getScore(), 320 + team2.side * 100, 40);
+        g.drawString("" + team2.getName(), 240 + team2.side * 200, 40);
 
         g.setColor(Color.CYAN);
 

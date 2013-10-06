@@ -7,7 +7,7 @@ import java.awt.*;
  */
 public class Ball extends P {
 
-    public static final int MAX_SPEED = 10;
+    public final int MAX_SPEED;
 
     protected V v = new V();
 
@@ -18,24 +18,27 @@ public class Ball extends P {
     Ball original;
 
     private Pitch pitch;
+    private Rules rules;
 
     public Ball() {
         // TODO pitch not initialized so hope it will be not used - only as data object
+        MAX_SPEED = 10;
     }
 
     /**
      * Creates a new instance of Ball
      */
-    public Ball(Pitch pitch) {
+    public Ball(Pitch pitch, Rules rules) {
         this.pitch = pitch;
+        this.rules = rules;
         reset();
+        MAX_SPEED = rules.getBallMaxSpeed();
     }
 
     void reset() {
         this.x = Pitch.WIDTH / 2;
         this.y = Pitch.HEIGHT / 2;
     }
-
 
     void kick(double vx, double vy) {
         kick(vx, vy, MAX_SPEED);
@@ -74,76 +77,87 @@ public class Ball extends P {
 
     }
 
-
     void doHalfMove() {
-        if (!pitch.ballType) {
-            add(vhalf);
+        if (rules.isStickyBallType()) {
+            stickyHalfMove();
+        } else {
+            javaHalfMove();
+        }
+    }
 
-            if ((x < 0) || (x > Pitch.WIDTH)) {
-                if ((y > 160) && (y < 320)) {
+    /**
+     * Emulation of Java ball rules. Ball will bounce when reach field boundary.
+     */
+    private void javaHalfMove() {
+        add(vhalf);
 
-                    if (isOriginal()) {
+        if ((x < 0) || (x > Pitch.WIDTH)) {
+            if ((y > 160) && (y < 320)) {
 
-                        System.out.println("GOOOOL");
-                        if (x > 320) {
-                            pitch.team1.score++;
-                        } else {
-                            pitch.team2.score++;
-                        }
+                if (isOriginal()) {
 
-                        Pitch.playSound(Pitch.goalClip);
+                    System.out.println("GOOOOL");
+                    if (x > 320) {
+                        pitch.team1.score++;
+                    } else {
+                        pitch.team2.score++;
                     }
 
+                    Pitch.playSound(Pitch.goalClip);
                 }
 
+            }
 
-                kick(-vx, vy);
+
+            kick(-vx, vy);
 
 //				v.x*=-1;
 //vhalf.x*=-1;
 
-            }
+        }
 
-            if ((y < 0) || (y > Pitch.HEIGHT)) {
-                kick(vx, -vy);
+        if ((y < 0) || (y > Pitch.HEIGHT)) {
+            kick(vx, -vy);
 //				v.y*=-1;
 //				vhalf.y*=-1;
-            }
-        } else {
-            add(vhalf);
+        }
+    }
 
-            if ((y < Pitch.TOPY) || (y > Pitch.BOTTOMY)) {
-                kick(0, 0);
-            }
+    /**
+     * Emulation of Pascal ball rules. Ball will stick when reach field boundary.
+     */
+    private void stickyHalfMove() {
+        add(vhalf);
 
-            if ((x < Pitch.LEFTX) || (x > Pitch.RIGHTX)) {
-                if ((y > 160) && (y < 320)) {
+        if ((y < Pitch.TOPY) || (y > Pitch.BOTTOMY)) {
+            kick(0, 0);
+        }
 
-                    if (isOriginal()) {
-                        System.out.println("GOOOOL");
-                        if (x > Pitch.CENTX) {
-                            pitch.team1.score++;
-                        } else {
-                            pitch.team2.score++;
-                        }
-                        Pitch.playSound(Pitch.goalClip);
+        if ((x < Pitch.LEFTX) || (x > Pitch.RIGHTX)) {
+            if ((y > 160) && (y < 320)) {
+
+                if (isOriginal()) {
+                    System.out.println("GOOOOL");
+                    if (x > Pitch.CENTX) {
+                        pitch.team1.score++;
+                    } else {
+                        pitch.team2.score++;
                     }
-
-
-                    reset();
-
+                    Pitch.playSound(Pitch.goalClip);
                 }
 
-                kick(0, 0);
+                reset();
 
             }
 
-            x = Math.min(Math.max(Pitch.LEFTX, x), Pitch.RIGHTX);
-            y = Math.min(Math.max(Pitch.TOPY, y), Pitch.BOTTOMY);
+            kick(0, 0);
 
         }
 
+        x = Math.min(Math.max(Pitch.LEFTX, x), Pitch.RIGHTX);
+        y = Math.min(Math.max(Pitch.TOPY, y), Pitch.BOTTOMY);
     }
+
 
     public void doVMove() {
         if (isOriginal()) {
@@ -173,7 +187,7 @@ public class Ball extends P {
     }
 
     public Object clone() {
-        Ball b = new Ball(pitch);
+        Ball b = new Ball(pitch, rules);
         b.x = x;
         b.y = y;
         b.vx = b.v_x = v.x;

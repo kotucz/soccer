@@ -27,12 +27,11 @@ public class Pitch {
 
     static AudioClip kickClip, melodyClip, goalClip;
 
-    int numPlayers = 5;
-    boolean ballType = true;
-
     Team team1, team2;
 
     protected Ball ball;
+
+    Rules rules = new Rules();
 
     public void newDuel(Team team1, Team team2) {
         this.team1 = team1;
@@ -41,18 +40,19 @@ public class Pitch {
 //		team1 = new Team();
 //		team2 = new Team();
 
-        team1.init(this);
-        team2.init(this);
+        final Player[] players1 = createPlayers(team1, -1);
+        final Player[] players2 = createPlayers(team2, 1);
+
+        team1.init(this, players1, players2);
+        team2.init(this, players2, players1);
         team1.setSide(-1);
         team2.setSide(1);
         team1.setTeamColor(Color.RED);
 //		team1.name = "RED Team";
 //		team2.name = "GREEN Team";
         team2.setTeamColor(Color.GREEN);
-        team1.opponents = team2.players;
-        team2.opponents = team1.players;
 
-        ball = new Ball(this);
+        ball = new Ball(this, rules);
         ball.original = ball;
 
         if ("kotuc.AtomTeam".equals(team2.getClass().getName())) {
@@ -73,13 +73,30 @@ public class Pitch {
         System.out.println("started");
     }
 
+    private Player[] createPlayers(Team team, int side) {
+        Player[] players = new Player[rules.getNumPlayers()];
+
+        for (int i = 0; i < players.length; i++) {
+            players[i] = new Player(i + 1, team);
+        }
+
+        for (Player p1 : players) {
+            p1.x = p1.dx = 320 + side * 100;
+            p1.y = p1.dy = 100 + p1.n * 40;
+        }
+        players[0].x = players[0].dx = 320 + side * 300;
+        players[0].y = players[0].dy = 240;
+
+        return players;
+    }
+
 //	java.util.List<Player> players = new LinkedList();
 
     public int getScore(int side) {
         if (side == -1) {
-            return team1.score;
+            return team1.getScore();
         } else if (side == 1) {
-            return team2.score;
+            return team2.getScore();
         } else {
             return -1;
         }

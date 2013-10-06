@@ -248,15 +248,15 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
                  * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
                  */
                 public void actionPerformed(ActionEvent arg0) {
-                    pitch.ballType = ballcheckbox.getState();
-                    pitch.numPlayers = Integer.valueOf(numplayerstextfield.getText());
+                    pitch.rules.ballType = ballcheckbox.getState();
+                    pitch.rules.numPlayers = Integer.valueOf(numplayerstextfield.getText());
                     newDuel(team1chooser.getSelectedIndex(), team2chooser.getSelectedIndex());
                 }
 
             });
 
-            ballcheckbox = new Checkbox("pascal ball", pitch.ballType);
-            numplayerstextfield = new TextField("" + pitch.numPlayers, 2);
+            ballcheckbox = new Checkbox("pascal ball", pitch.rules.ballType);
+            numplayerstextfield = new TextField("" + pitch.rules.numPlayers, 2);
 
             add(team1chooser);
             add(team2chooser);
@@ -269,8 +269,6 @@ public class SoccerApplet extends Applet implements MouseListener, KeyListener, 
 
             setSize(200, 150);
         }
-
-
     }
 
     public void newDuel(int id1, int id2) {
