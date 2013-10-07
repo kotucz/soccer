@@ -20,7 +20,6 @@ public class UI_Koste extends PascalTeam {
                 mindist = a[i].distance(getBall());
             }
         }
-        ;
 
         a[mini].goTo(getBall().x, getBall().y);
 

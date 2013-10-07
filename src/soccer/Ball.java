@@ -186,6 +186,7 @@ public class Ball extends P {
         return (original == this);
     }
 
+    @Override
     public Object clone() {
         Ball b = new Ball(pitch, rules);
         b.x = x;

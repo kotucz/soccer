@@ -166,13 +166,12 @@ public class EvolTeam2 extends Team {
 
             configs[3] = (WConfig) configs[2].clone();
             configs[3].mutate(changerate);
-            ;
+
             configs[2].mutate(changerate);
-            ;
 
             configs[1] = (WConfig) configs[1].clone();
             configs[1].mutate(changerate);
-            ;
+
             configs[0] = configs[0];
 
 

@@ -15,7 +15,6 @@ public class Duck extends Team {
                 mindist = players[i].distance(getBall());
             }
         }
-        ;
 
         players[mini].dx = getBall().x;
         players[mini].dy = getBall().y;
