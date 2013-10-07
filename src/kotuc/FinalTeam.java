@@ -23,7 +23,9 @@ public class FinalTeam extends BaseKotuczTeam {
 
         g = bIm.getGraphics();
 
-        g.setColor(getTeamColor());
+        if (coolgraphics) {
+            g.setColor(getTeamColor());
+        }
 
         plays = getPlayers();
         opps = getOpponents();
@@ -36,15 +38,6 @@ public class FinalTeam extends BaseKotuczTeam {
         P bestt = ballAiming();
         kickBall(bestt.x, bestt.y);
 
-        if (coolgraphics) {
-            g.setColor(Color.GRAY);
-            g.drawLine((int) ball.x, (int) ball.y, (int) bestt.x, (int) bestt.y);
-
-            for (Player p1 : plays) {
-                g.drawLine((int) p1.x, (int) p1.y, (int) p1.cil_x, (int) p1.cil_y);
-            }
-        }
-
 
         Player pbr = goalkeeper();
 
@@ -54,6 +47,16 @@ public class FinalTeam extends BaseKotuczTeam {
                 break;
             }
         }
+
+        if (coolgraphics) {
+            g.setColor(Color.GRAY);
+            g.drawLine((int) ball.x, (int) ball.y, (int) bestt.x, (int) bestt.y);
+
+            for (Player p1 : plays) {
+                g.drawLine((int) p1.x, (int) p1.y, (int) p1.cil_x, (int) p1.cil_y);
+            }
+        }
+
     }
 
 
@@ -158,11 +161,11 @@ public class FinalTeam extends BaseKotuczTeam {
                 bestd = l1;
             }
 
-//			if (coolgraphics) { 
-            if (false) {
+            if (coolgraphics) {
                 try {
                     g.setColor(new Color(0, 0, (int) (Math.min(qual / (bestq), 1) * 255)));
                     g.fillOval((int) l1.x - 10, (int) l1.y - 10, 20, 20);
+                    g.drawString("x" + Math.round(qual * 100), (int) l1.x, (int) l1.y);
                 } catch (Exception e) {
                     println(e.getMessage() + "colorblue:" + (int) (Math.min(qual / (6 + 1 + 2 + 1), 1) * 255));
                 }

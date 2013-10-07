@@ -30,9 +30,13 @@ public class EvolTeam2 extends BaseKotuczTeam {
 
     public void ui() {
 
+        bIm = new BufferedImage(Pitch.WIDTH, Pitch.HEIGHT, BufferedImage.TYPE_INT_ARGB | BufferedImage.OPAQUE);
+
         g = bIm.getGraphics();
 
-        if (coolgraphics) g.setColor(getTeamColor());
+        if (coolgraphics) {
+            g.setColor(getTeamColor());
+        }
 
         plays = getPlayers();
         opps = getOpponents();
@@ -48,12 +52,6 @@ public class EvolTeam2 extends BaseKotuczTeam {
         P bestt = ballAiming();
         kickBall(bestt.x, bestt.y);
 
-        if (coolgraphics) {
-            g.setColor(Color.GRAY);
-            g.drawLine((int) ball.x, (int) ball.y, (int) bestt.x, (int) bestt.y);
-
-
-        }
 
         pgo = nearestGo();
 
@@ -61,16 +59,22 @@ public class EvolTeam2 extends BaseKotuczTeam {
         Player pbr = goalkeeper();
 
         for (Player p1 : plays) {
-            if ((p1 != pgo) && (p1 != pbr)) position(p1);
-
-
+            if ((p1 != pgo) && (p1 != pbr)) {
+                position(p1);
+            }
         }
 
+        if (coolgraphics) {
+            g.setColor(Color.GRAY);
+            g.drawLine((int) ball.x, (int) ball.y, (int) bestt.x, (int) bestt.y);
+
+            for (Player p1 : plays) {
+                g.drawLine((int) p1.x, (int) p1.y, (int) p1.cil_x, (int) p1.cil_y);
+            }
+        }
 
         g.setColor(Color.CYAN);
         g.drawString(generation + "." + curconfig + ". cuid:" + config.cuid + " " + config.homescore + "/" + config.hostscore + " (" + (int) (config.getFragrate() * 100) + "%) t:-" + (updateInterval - (System.currentTimeMillis() - lastUpdate)) / 100, 410, 60);
-
-
     }
 
     /**
@@ -80,10 +84,12 @@ public class EvolTeam2 extends BaseKotuczTeam {
         double bestqual = 0;
         P bestt = null;
 
+
         for (int i = 0; i < tgts.length; i++) {
             P t1 = tgts[i];
             if (t1 == null) t1 = tgts[i] = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
             double qual = 0;
+
 
             if (coolgraphics) g.setColor(Color.RED);
             for (Player o1 : opps) {
