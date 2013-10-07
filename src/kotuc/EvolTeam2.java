@@ -74,6 +74,179 @@ public class EvolTeam2 extends BaseKotuczTeam {
 
     }
 
+    /**
+     * neural where to kick the ball
+     */
+    P ballAiming() {
+        double bestqual = 0;
+        P bestt = null;
+
+        for (int i = 0; i < tgts.length; i++) {
+            P t1 = tgts[i];
+            if (t1 == null) t1 = tgts[i] = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
+            double qual = 0;
+
+            if (coolgraphics) g.setColor(Color.RED);
+            for (Player o1 : opps) {
+                double diff = angle(o1, ball, t1);
+                if (coolgraphics) g.drawLine((int) ball.x, (int) ball.y, (int) o1.x, (int) o1.y);
+//				anywhere where no enemy 
+                qual += config.get(W.careness) * Math.min(diff, 1);//*100/o1.distance(ball);
+
+            }
+
+            if (coolgraphics) g.setColor(Color.GREEN);
+            for (Player p1 : plays) {
+                double diff = angle(p1, ball, t1);
+                if (coolgraphics) g.drawLine((int) ball.x, (int) ball.y, (int) p1.x, (int) p1.y);
+//				anywhere where a friend
+                qual += config.get(W.teamcoop) * (1 - Math.min(diff, 1));//*100/o1.distance(ball);
+            }
+
+//			depending on the distance to goal        	
+            qual += config.get(W.agresivity) * Math.pow(Math.max(0, 1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(t1) / 500), config.get(W.agresivityexp));
+
+            if (qual > bestqual) {
+                bestqual = qual;
+                bestt = t1;
+            }
+
+            if (coolgraphics) {
+                try {
+                    g.setColor(new Color((int) (Math.min((qual / (14)), 1) * 255), 0, 0));
+                    g.fillOval((int) t1.x - 10, (int) t1.y - 10, 20, 20);
+                    g.drawString("x" + Math.round(qual * 100), (int) t1.x, (int) t1.y);
+                } catch (Exception e) {
+                    println(e.getMessage() + "colorred:" + (int) ((qual / (6 + 3 + 3)) * 255));
+                }
+            }
+
+            if (qual < config.get(W.toogood))
+                if ((qual < config.get(W.toobad)) || (Math.random() < config.get(W.randomizing))) tgts[i] = null;
+        }
+
+        return bestt;
+    }
+
+    Player nearestGo() {
+
+        /**
+         * 	time nearest player go after ball in direct way
+         *
+         * 	using virtual ball simulation
+         */
+
+        Player pgo = null;
+
+        if (coolgraphics) g.setColor(Color.GREEN);
+
+        P xpoint1 = ball.getP();
+
+        V bv = ball.getV();
+
+        end1:
+        for (int t = 0; t < 500; t++) {
+            xpoint1.add(bv);
+            if ((xpoint1.x < 0) || (xpoint1.x > Pitch.WIDTH)) bv.x *= -1;
+            if ((xpoint1.y < 0) || (xpoint1.y > Pitch.HEIGHT)) bv.y *= -1;
+
+            if (coolgraphics) g.drawLine((int) xpoint1.x, (int) xpoint1.y, (int) xpoint1.x, (int) xpoint1.y);
+
+            for (Player p1 : plays) {
+                if (p1.distance(xpoint1) < (Player.MAX_SPEED * t)) {
+
+//					println("t = "+t);
+
+                    pgo = p1;
+                    pgo.goTo(xpoint1);
+
+                    break end1;
+                }
+            }
+
+        }
+
+        if (coolgraphics) if (pgo != null) g.drawLine((int) pgo.x, (int) pgo.y, (int) xpoint1.x, (int) xpoint1.y);
+
+        return pgo;
+
+
+    }
+
+
+    P position(Player p1) {
+        /**
+         * 	where players should go
+         *
+         */
+
+        double bestq = 0;
+        P bestd = null;
+
+        for (int i = 0; i < locs.length; i++) {
+            P l1 = locs[i];
+            //create new random
+            if (l1 == null) l1 = locs[i] = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
+            double qual = 0;
+
+//			g.setColor(Color.RED);
+            for (Player o1 : opps) {
+                double diff = angle(o1, l1, ball);
+//				g.drawLine((int)ball.x, (int)ball.y, (int)o1.x, (int)o1.y);
+//				anywhere where closer to ball than enemy 
+                qual += config.get(W.blocking) * diff / Math.PI;//*100/o1.distance(ball);
+
+            }
+
+
+            for (Player p2 : plays) {
+                if (p2 == p1) continue;
+                qual += config.get(W.repelency) * Math.pow(Math.min(p2.distance(l1) / 500, 1), config.get(W.repelencyexp));
+            }
+
+            qual += config.get(W.locstability) * Math.max(0, 500 - p1.distance(l1)) / 500;
+
+//			depending on the distance to goal        	
+            qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(l1) / 500));
+
+            if (qual > bestq) {
+                bestq = qual;
+                bestd = l1;
+            }
+
+            if (coolgraphics) {
+                try {
+                    g.setColor(new Color(0, 0, (int) (Math.min(qual / (14), 1) * 255)));
+                    g.fillOval((int) l1.x - 10, (int) l1.y - 10, 20, 20);
+                    g.drawString("x" + Math.round(qual * 100), (int) l1.x, (int) l1.y);
+                } catch (Exception e) {
+                    println(e.getMessage() + "colorblue:" + (int) (Math.min(qual / (6 + 1 + 2 + 1), 1) * 255));
+                }
+            }
+
+            if (qual < config.get(W.toogoodloc))
+                if ((qual < config.get(W.toobadloc)) || (Math.random() < config.get(W.randomizingloc))) locs[i] = null;
+        }
+
+
+        p1.goTo(bestd.x, bestd.y);
+
+        return bestd;
+
+    }
+
+
+    BufferedImage bIm = new BufferedImage(Pitch.WIDTH, Pitch.HEIGHT, BufferedImage.TYPE_INT_ARGB | BufferedImage.OPAQUE);
+
+    public void paint(Graphics g) {
+
+        if (coolgraphics) g.drawImage(bIm, 0, 0, null);
+
+        super.paint(g);
+
+        bIm = new BufferedImage(Pitch.WIDTH, Pitch.HEIGHT, BufferedImage.TYPE_INT_ARGB | BufferedImage.OPAQUE);
+    }
+
 
     long updateInterval = 60 * 1000; // one minute
 
@@ -115,7 +288,7 @@ public class EvolTeam2 extends BaseKotuczTeam {
 
         if (curconfig >= configs.length) {
 
-//			do selections:		
+//			do selections:
 
             println("all configs tested");
 
@@ -190,169 +363,6 @@ public class EvolTeam2 extends BaseKotuczTeam {
     }
 
 
-    /**
-     * neural where to kick the ball
-     */
-    P ballAiming() {
-        double bestqual = 0;
-        P bestt = null;
-
-        for (int i = 0; i < tgts.length; i++) {
-            P t1 = tgts[i];
-            if (t1 == null) t1 = tgts[i] = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
-            double qual = 0;
-
-            if (coolgraphics) g.setColor(Color.RED);
-            for (Player o1 : opps) {
-                double diff = angle(o1, ball, t1);
-                if (coolgraphics) g.drawLine((int) ball.x, (int) ball.y, (int) o1.x, (int) o1.y);
-//				anywhere where no enemy 
-                qual += config.get(W.careness) * Math.min(diff, 1);//*100/o1.distance(ball);
-
-            }
-
-            if (coolgraphics) g.setColor(Color.GREEN);
-            for (Player p1 : plays) {
-                double diff = angle(p1, ball, t1);
-                if (coolgraphics) g.drawLine((int) ball.x, (int) ball.y, (int) p1.x, (int) p1.y);
-//				anywhere where a friend
-                qual += config.get(W.teamcoop) * (1 - Math.min(diff, 1));//*100/o1.distance(ball);
-            }
-
-//			depending on the distance to goal        	
-            qual += config.get(W.agresivity) * Math.pow(Math.max(0, 1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(t1) / 500), config.get(W.agresivityexp));
-
-            if (qual > bestqual) {
-                bestqual = qual;
-                bestt = t1;
-            }
-
-            if (coolgraphics) {
-                try {
-                    g.setColor(new Color((int) (Math.min((qual / (14)), 1) * 255), 0, 0));
-                    g.fillOval((int) t1.x - 10, (int) t1.y - 10, 20, 20);
-                    g.drawString("x" + Math.round(qual * 100), (int) t1.x, (int) t1.y);
-                } catch (Exception e) {
-                    println(e.getMessage() + "colorred:" + (int) ((qual / (6 + 3 + 3)) * 255));
-                }
-            }
-
-            if (qual < config.get(W.toogood))
-                if ((qual < config.get(W.toobad)) || (Math.random() < config.get(W.randomizing))) tgts[i] = null;
-        }
-
-        return bestt;
-    }
-
-
-    P position(Player p1) {
-        /**
-         * 	where players should go
-         *
-         */
-
-        double bestq = 0;
-        P bestd = null;
-
-        for (int i = 0; i < locs.length; i++) {
-            P l1 = locs[i];
-            //create new random
-            if (l1 == null) l1 = locs[i] = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
-            double qual = 0;
-
-//			g.setColor(Color.RED);
-            for (Player o1 : opps) {
-                double diff = angle(o1, l1, ball);
-//				g.drawLine((int)ball.x, (int)ball.y, (int)o1.x, (int)o1.y);
-//				anywhere where closer to ball than enemy 
-                qual += config.get(W.blocking) * diff / Math.PI;//*100/o1.distance(ball);
-
-            }
-
-
-            for (Player p2 : plays) {
-                if (p2 == p1) continue;
-                qual += config.get(W.repelency) * Math.pow(Math.min(p2.distance(l1) / 500, 1), config.get(W.repelencyexp));
-            }
-
-            qual += config.get(W.locstability) * Math.max(0, 500 - p1.distance(l1)) / 500;
-
-//			depending on the distance to goal        	
-            qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(l1) / 500));
-
-            if (qual > bestq) {
-                bestq = qual;
-                bestd = l1;
-            }
-
-            if (coolgraphics) {
-                try {
-                    g.setColor(new Color(0, 0, (int) (Math.min(qual / (14), 1) * 255)));
-                    g.fillOval((int) l1.x - 10, (int) l1.y - 10, 20, 20);
-                    g.drawString("x" + Math.round(qual * 100), (int) l1.x, (int) l1.y);
-                } catch (Exception e) {
-                    println(e.getMessage() + "colorblue:" + (int) (Math.min(qual / (6 + 1 + 2 + 1), 1) * 255));
-                }
-            }
-
-            if (qual < config.get(W.toogoodloc))
-                if ((qual < config.get(W.toobadloc)) || (Math.random() < config.get(W.randomizingloc))) locs[i] = null;
-        }
-
-
-        p1.goTo(bestd.x, bestd.y);
-
-        return bestd;
-
-    }
-
-
-    Player nearestGo() {
-
-        /**
-         * 	time nearest player go after ball in direct way
-         *
-         * 	using virtual ball simulation
-         */
-
-        Player pgo = null;
-
-        if (coolgraphics) g.setColor(Color.GREEN);
-
-        P xpoint1 = ball.getP();
-
-        V bv = ball.getV();
-
-        end1:
-        for (int t = 0; t < 500; t++) {
-            xpoint1.add(bv);
-            if ((xpoint1.x < 0) || (xpoint1.x > Pitch.WIDTH)) bv.x *= -1;
-            if ((xpoint1.y < 0) || (xpoint1.y > Pitch.HEIGHT)) bv.y *= -1;
-
-            if (coolgraphics) g.drawLine((int) xpoint1.x, (int) xpoint1.y, (int) xpoint1.x, (int) xpoint1.y);
-
-            for (Player p1 : plays) {
-                if (p1.distance(xpoint1) < (Player.MAX_SPEED * t)) {
-
-//					println("t = "+t);
-
-                    pgo = p1;
-                    pgo.goTo(xpoint1);
-
-                    break end1;
-                }
-            }
-
-        }
-
-        if (coolgraphics) if (pgo != null) g.drawLine((int) pgo.x, (int) pgo.y, (int) xpoint1.x, (int) xpoint1.y);
-
-        return pgo;
-
-
-    }
-
-
     void areaDivision() {
         /**
          * 	area divVision
@@ -384,18 +394,6 @@ public class EvolTeam2 extends BaseKotuczTeam {
                 if (coolgraphics) if (bp != null) g.drawString("" + bp.n, (int) pxy.x - 5, (int) pxy.y - 5);
             }
         }
-    }
-
-
-    BufferedImage bIm = new BufferedImage(Pitch.WIDTH, Pitch.HEIGHT, BufferedImage.TYPE_INT_ARGB | BufferedImage.OPAQUE);
-
-    public void paint(Graphics g) {
-
-        if (coolgraphics) g.drawImage(bIm, 0, 0, null);
-
-        super.paint(g);
-
-        bIm = new BufferedImage(Pitch.WIDTH, Pitch.HEIGHT, BufferedImage.TYPE_INT_ARGB | BufferedImage.OPAQUE);
     }
 
 
