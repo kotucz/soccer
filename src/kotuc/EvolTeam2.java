@@ -88,29 +88,37 @@ public class EvolTeam2 extends BaseKotuczTeam {
         for (int i = 0; i < tgts.length; i++) {
             P t1 = tgts[i];
             if (t1 == null) t1 = tgts[i] = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
+
+
             double qual = 0;
+            {
 
-
-            if (coolgraphics) g.setColor(Color.RED);
-            for (Player o1 : opps) {
-                double diff = angle(o1, ball, t1);
-                if (coolgraphics) g.drawLine((int) ball.x, (int) ball.y, (int) o1.x, (int) o1.y);
-//				anywhere where no enemy 
-                qual += config.get(W.careness) * Math.min(diff, 1);//*100/o1.distance(ball);
-
-            }
-
-            if (coolgraphics) g.setColor(Color.GREEN);
-            for (Player p1 : plays) {
-                double diff = angle(p1, ball, t1);
-                if (coolgraphics) g.drawLine((int) ball.x, (int) ball.y, (int) p1.x, (int) p1.y);
+                for (Player p1 : plays) {
+                    double diff = angle(p1, ball, t1);
+                    if (coolgraphics) {
+                        g.setColor(Color.GREEN);
+                        g.drawLine((int) ball.x, (int) ball.y, (int) p1.x, (int) p1.y);
+                    }
 //				anywhere where a friend
-                qual += config.get(W.teamcoop) * (1 - Math.min(diff, 1));//*100/o1.distance(ball);
+                    qual += config.get(W.teamcoop) * (1 - Math.min(diff, 1));//*100/o1.distance(ball);
+                }
+
+
+                for (Player o1 : opps) {
+                    double diff = angle(o1, ball, t1);
+                    if (coolgraphics) {
+                        g.setColor(Color.RED);
+                        g.drawLine((int) ball.x, (int) ball.y, (int) o1.x, (int) o1.y);
+                    }
+//				anywhere where no enemy
+                    qual += config.get(W.careness) * Math.min(diff, 1);//*100/o1.distance(ball);
+
+                }
+
+
+//			depending on the distance to goal
+                qual += config.get(W.agresivity) * Math.pow(Math.max(0, 1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(t1) / 500), config.get(W.agresivityexp));
             }
-
-//			depending on the distance to goal        	
-            qual += config.get(W.agresivity) * Math.pow(Math.max(0, 1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(t1) / 500), config.get(W.agresivityexp));
-
             if (qual > bestqual) {
                 bestqual = qual;
                 bestt = t1;

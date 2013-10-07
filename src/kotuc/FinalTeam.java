@@ -79,28 +79,32 @@ public class FinalTeam extends BaseKotuczTeam {
         for (int i = 0; i < 27; i++) {
             double ang = Math.PI * 2 * i / 27.0;
             P t1 = new P(ball.x + 50 * Math.cos(ang), ball.y + 50 * Math.sin(ang));
+
             double qual = 0;
+            {
 
-            for (Player p1 : plays) {
-                if (p1 == pgo) continue;
-                double diff = angle(p1, ball, t1);
+                for (Player p1 : plays) {
+                    if (p1 == pgo) continue;
+                    double diff = angle(p1, ball, t1);
+                    if (coolgraphics) {
+                        g.drawLine((int) ball.x, (int) ball.y, (int) p1.x, (int) p1.y);
+                    }
 //				anywhere where a friend
-                qual += config.get(W.teamcoop) * (Math.max(0, (criticalangle - diff) / criticalangle));// /(ball.distance(p1)/100);
-            }
-
+                    qual += config.get(W.teamcoop) * (Math.max(0, (criticalangle - diff) / criticalangle));// /(ball.distance(p1)/100);
+                }
 
 //			depending on the distance to goal        	
-            qual += config.get(W.agresivity) * Math.max((criticalangle - angle(g1, ball, t1)) / criticalangle, 0);
+                qual += config.get(W.agresivity) * Math.max((criticalangle - angle(g1, ball, t1)) / criticalangle, 0);
 
-
-            for (Player o1 : opps) {
-                double diff = angle(o1, ball, t1);
+                for (Player o1 : opps) {
+                    double diff = angle(o1, ball, t1);
 //				anywhere where no enemy 
-                qual *= (Math.min(diff, criticalangle)) / criticalangle;
+                    qual *= (Math.min(diff, criticalangle)) / criticalangle;
+                }
+
+                qual *= Math.min(angle(ng1, ball, t1) / criticalangle, 1);
+
             }
-
-            qual *= Math.min(angle(ng1, ball, t1) / criticalangle, 1);
-
             if (qual > bestqual) {
                 bestqual = qual;
                 bestt = t1;
@@ -117,7 +121,6 @@ public class FinalTeam extends BaseKotuczTeam {
             }
 
         }
-
 
         return bestt;
     }
