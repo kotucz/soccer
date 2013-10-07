@@ -1,30 +1,22 @@
 package kotuc;
 
-import soccer.*;
+import soccer.Ball;
+import soccer.P;
+import soccer.Pitch;
+import soccer.Player;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class FinalTeam extends Team {
-
-    Graphics g;
-
-    Player[] plays;
-    Player[] opps;
-    Ball ball;
-
-    Player pgo;
-
-    boolean coolgraphics = false;
-
-    WConfig config = new WConfig();
-
-    public FinalTeam() {
-        coolgraphics = false;
-//		locs = new P[80];
-    }
+public class FinalTeam extends BaseKotuczTeam {
 
     BufferedImage bIm;
+
+    public FinalTeam() {
+        super();
+        //		locs = new P[80];
+    }
+
 
     public void ui() {
 
@@ -63,8 +55,8 @@ public class FinalTeam extends Team {
                 break;
             }
         }
-
     }
+
 
     // TODO set to 0 and grow as enemy gets the ball
     double criticalangle = 1.1;//rad
@@ -168,33 +160,6 @@ public class FinalTeam extends Team {
 
     }
 
-    Player goalkeeper() {
-        /**
-         * 	nearest player to goal is goalkeeper go to goal
-         *
-         */
-
-        Player pbr = null;
-
-        P gomin = new P(320 + getSideSign() * 300, 240);
-
-        double mindist = 1000;
-
-        for (Player p1 : plays) {
-            if (p1.distance(gomin) < mindist) {
-                if (p1 != pgo) {
-                    pbr = p1;
-                    mindist = p1.distance(gomin);
-                }
-            }
-        }
-
-        if (pbr != null) pbr.goTo(gomin);
-
-        return pbr;
-
-    }
-
     P position(Player p1) {
         /**
          * 	where players should go
@@ -252,15 +217,6 @@ public class FinalTeam extends Team {
         return bestd;
 
     }
-
-    public static double angle(P a, P v, P b) {
-        V v1 = new V();
-        V v2 = new V();
-        v1.sub(a, v);
-        v2.sub(b, v);
-        return v1.angle(v2);//Math.acos((v1.));
-    }
-
 
     public void paint(Graphics g) {
 

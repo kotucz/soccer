@@ -1,6 +1,9 @@
 package kotuc;
 
-import soccer.*;
+import soccer.P;
+import soccer.Pitch;
+import soccer.Player;
+import soccer.V;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -9,33 +12,22 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Date;
 
-public class EvolTeam2 extends Team {
-
-
-    WConfig config = new WConfig();
+public class EvolTeam2 extends BaseKotuczTeam {
 
     P[] tgts = new P[30];
 
     P[] locs = new P[30];
 
-    boolean coolgraphics = false;
     boolean logsenabled = false;
 
     WConfig[] configs = new WConfig[5];
-
-    Graphics g;
-
-    Player[] plays;
-    Player[] opps;
-    Ball ball;
-
-    Player pgo;
 
     public EvolTeam2() {
         for (int i = 0; i < configs.length; i++) {
             configs[i] = new WConfig();
         }
     }
+
 
     public void ui() {
 
@@ -56,17 +48,23 @@ public class EvolTeam2 extends Team {
 
         P bestt = ballAiming();
         kickBall(bestt.x, bestt.y);
+
         if (coolgraphics) {
             g.setColor(Color.GRAY);
             g.drawLine((int) ball.x, (int) ball.y, (int) bestt.x, (int) bestt.y);
+
+
         }
 
         pgo = nearestGo();
+
 
         Player pbr = goalkeeper();
 
         for (Player p1 : plays) {
             if ((p1 != pgo) && (p1 != pbr)) position(p1);
+
+
         }
 
 
@@ -355,33 +353,6 @@ public class EvolTeam2 extends Team {
     }
 
 
-    Player goalkeeper() {
-        /**
-         * 	nearest player to goal is goalkeeper go to goal
-         *
-         */
-
-        Player pbr = null;
-
-        P gomin = new P(320 + getSideSign() * 300, 240);
-
-        double mindist = 1000;
-
-        for (Player p1 : plays) {
-            if (p1.distance(gomin) < mindist) {
-                if (p1 != pgo) {
-                    pbr = p1;
-                    mindist = p1.distance(gomin);
-                }
-            }
-        }
-
-        if (pbr != null) pbr.goTo(gomin);
-
-        return pbr;
-
-    }
-
     void areaDivision() {
         /**
          * 	area divVision
@@ -425,14 +396,6 @@ public class EvolTeam2 extends Team {
         super.paint(g);
 
         bIm = new BufferedImage(Pitch.WIDTH, Pitch.HEIGHT, BufferedImage.TYPE_INT_ARGB | BufferedImage.OPAQUE);
-    }
-
-    public static double angle(P a, P v, P b) {
-        V v1 = new V();
-        V v2 = new V();
-        v1.sub(a, v);
-        v2.sub(b, v);
-        return v1.angle(v2);//Math.acos((v1.));
     }
 
 
