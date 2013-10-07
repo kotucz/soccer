@@ -6,6 +6,8 @@ import soccer.Player;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FinalTeam extends BaseKotuczTeam {
 
@@ -67,8 +69,6 @@ public class FinalTeam extends BaseKotuczTeam {
      * neural where to kick the ball
      */
     P ballAiming() {
-        double bestqual = 0;
-        P bestt = ball.getP();
 
 //		P g0 = new P((1-getSide())*320, 165);
         P g1 = new P((1 - getSideSign()) * 320, 165 + Math.random() * 150);
@@ -76,53 +76,68 @@ public class FinalTeam extends BaseKotuczTeam {
 
         P ng1 = new P((1 + getSideSign()) * 320, Pitch.CENTY);
 
+        List<QualityPoint> targets = new ArrayList<QualityPoint>(27);
+
         for (int i = 0; i < 27; i++) {
             double ang = Math.PI * 2 * i / 27.0;
-            P t1 = new P(ball.x + 50 * Math.cos(ang), ball.y + 50 * Math.sin(ang));
-
-            double qual = 0;
-            {
-
-                for (Player p1 : plays) {
-                    if (p1 == pgo) continue;
-                    double diff = angle(p1, ball, t1);
-                    if (coolgraphics) {
-                        g.drawLine((int) ball.x, (int) ball.y, (int) p1.x, (int) p1.y);
-                    }
-//				anywhere where a friend
-                    qual += config.get(W.teamcoop) * (Math.max(0, (criticalangle - diff) / criticalangle));// /(ball.distance(p1)/100);
-                }
-
-//			depending on the distance to goal        	
-                qual += config.get(W.agresivity) * Math.max((criticalangle - angle(g1, ball, t1)) / criticalangle, 0);
-
-                for (Player o1 : opps) {
-                    double diff = angle(o1, ball, t1);
-//				anywhere where no enemy 
-                    qual *= (Math.min(diff, criticalangle)) / criticalangle;
-                }
-
-                qual *= Math.min(angle(ng1, ball, t1) / criticalangle, 1);
-
-            }
-            if (qual > bestqual) {
-                bestqual = qual;
-                bestt = t1;
-            }
-
-            if (coolgraphics) {
-                try {
-                    g.setColor(new Color((int) (Math.min((qual / bestqual), 1) * 255), 0, 0));
-                    g.fillOval((int) t1.x - 5, (int) t1.y - 5, 10, 10);
-//					g.drawString("x"+Math.round(qual*100), (int)t1.x, (int)t1.y);
-                } catch (Exception e) {
-                    println(e.getMessage() + "colorred:" + (int) ((qual / (6 + 3 + 3)) * 255));
-                }
-            }
-
+            P target = new P(ball.x + 50 * Math.cos(ang), ball.y + 50 * Math.sin(ang));
+            targets.add(new QualityPoint(target));
         }
 
-        return bestt;
+        QualityPoint best = new QualityPoint(ball.getP());
+
+        for (QualityPoint target : targets) {
+
+            target.quality = evaluateBallTarget(target.point, g1, ng1);
+
+            if (target.quality > best.quality) {
+                best = target;
+            }
+        }
+
+        if (coolgraphics) {
+            for (QualityPoint target : targets) {
+                try {
+                    g.setColor(new Color((int) (Math.min((target.quality / best.quality), 1) * 255), 0, 0));
+                    g.fillOval((int) target.point.x - 5, (int) target.point.y - 5, 10, 10);
+//					g.drawString("x"+Math.round(qual*100), (int)target.x, (int)target.y);
+                } catch (Exception e) {
+                    println(e.getMessage() + "colorred:" + (int) ((target.quality / (6 + 3 + 3)) * 255));
+                }
+            }
+        }
+
+        return best.point;
+    }
+
+    private double evaluateBallTarget(P t1, P g1, P ng1) {
+        double qual = 0;
+        {
+
+            for (Player p1 : plays) {
+                if (p1 == pgo) continue;
+                double diff = angle(p1, ball, t1);
+                if (coolgraphics) {
+                    g.drawLine((int) ball.x, (int) ball.y, (int) p1.x, (int) p1.y);
+                }
+//				anywhere where a friend
+                qual += config.get(W.teamcoop) * (Math.max(0, (criticalangle - diff) / criticalangle));// /(ball.distance(p1)/100);
+            }
+
+//			depending on the distance to goal
+            qual += config.get(W.agresivity) * Math.max((criticalangle - angle(g1, ball, t1)) / criticalangle, 0);
+
+            for (Player o1 : opps) {
+                double diff = angle(o1, ball, t1);
+//				anywhere where no enemy
+                qual *= (Math.min(diff, criticalangle)) / criticalangle;
+            }
+
+            // not own goal
+            qual *= Math.min(angle(ng1, ball, t1) / criticalangle, 1);
+
+        }
+        return qual;
     }
 
     P position(Player p1) {

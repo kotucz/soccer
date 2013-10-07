@@ -98,4 +98,18 @@ public abstract class BaseKotuczTeam extends Team {
 
 
     }
+
+    static class QualityPoint {
+        P point;
+        double quality;
+
+        public QualityPoint() {
+        }
+
+        public QualityPoint(P point) {
+            this.point = point;
+        }
+
+    }
+
 }
