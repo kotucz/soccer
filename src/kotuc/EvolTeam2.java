@@ -3,7 +3,6 @@ package kotuc;
 import soccer.P;
 import soccer.Pitch;
 import soccer.Player;
-import soccer.V;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -127,52 +126,6 @@ public class EvolTeam2 extends BaseKotuczTeam {
 
         return bestt;
     }
-
-    Player nearestGo() {
-
-        /**
-         * 	time nearest player go after ball in direct way
-         *
-         * 	using virtual ball simulation
-         */
-
-        Player pgo = null;
-
-        if (coolgraphics) g.setColor(Color.GREEN);
-
-        P xpoint1 = ball.getP();
-
-        V bv = ball.getV();
-
-        end1:
-        for (int t = 0; t < 500; t++) {
-            xpoint1.add(bv);
-            if ((xpoint1.x < 0) || (xpoint1.x > Pitch.WIDTH)) bv.x *= -1;
-            if ((xpoint1.y < 0) || (xpoint1.y > Pitch.HEIGHT)) bv.y *= -1;
-
-            if (coolgraphics) g.drawLine((int) xpoint1.x, (int) xpoint1.y, (int) xpoint1.x, (int) xpoint1.y);
-
-            for (Player p1 : plays) {
-                if (p1.distance(xpoint1) < (Player.MAX_SPEED * t)) {
-
-//					println("t = "+t);
-
-                    pgo = p1;
-                    pgo.goTo(xpoint1);
-
-                    break end1;
-                }
-            }
-
-        }
-
-        if (coolgraphics) if (pgo != null) g.drawLine((int) pgo.x, (int) pgo.y, (int) xpoint1.x, (int) xpoint1.y);
-
-        return pgo;
-
-
-    }
-
 
     P position(Player p1) {
         /**
