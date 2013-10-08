@@ -140,62 +140,71 @@ public class FinalTeam extends BaseKotuczTeam {
         return qual;
     }
 
+    /**
+     * where players should go
+     */
     P position(Player p1) {
-        /**
-         * 	where players should go
-         *
-         */
 
-        double bestq = 0;
-        P bestd = p1;
+        List<QualityPoint> locs = new ArrayList<QualityPoint>(50);
 
         for (int i = 0; i < 50; i++) {
-            P l1 = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
-            double qual = 1;
+            locs.add(new QualityPoint(new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT)));
+        }
 
-            for (Player o1 : opps) {
-                double diff = angle(o1, l1, ball);
+        QualityPoint best = new QualityPoint();
 
-//				anywhere where closer to ball than enemy 
-                qual += config.get(W.blocking) * diff / Math.PI;//*100/o1.distance(ball);
+        for (QualityPoint location : locs) {
 
+            location.quality = evaluateLocation(p1, location.point);
+
+            if (location.quality > best.quality) {
+                best = location;
             }
+        }
 
-            qual += config.get(W.locstability) * Math.max(0, 500 - p1.distance(l1)) / 500;
-
-//			depending on the distance to goal        	
-            qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(l1) / 500));
-
-
-            for (Player p2 : plays) {
-                if ((p2 == p1) || (p1 == pgo)) continue;
-                double diff = angle(p2, ball, l1);
-// to be in all directions around ball				
-                qual *= (1 + config.get(W.repelency) * Math.min(diff / criticalangle, 1)) / (1 + config.get(W.repelency));
-            }
-
-            if (qual > bestq) {
-                bestq = qual;
-                bestd = l1;
-            }
-
-            if (coolgraphics) {
+        if (coolgraphics) {
+            for (QualityPoint location : locs) {
                 try {
-                    g.setColor(new Color(0, 0, (int) (Math.min(qual / (bestq), 1) * 255)));
-                    g.fillOval((int) l1.x - 10, (int) l1.y - 10, 20, 20);
-                    g.drawString("x" + Math.round(qual * 100), (int) l1.x, (int) l1.y);
+                    g.setColor(new Color(0, 0, (int) (Math.min(location.quality / (best.quality), 1) * 255)));
+                    g.fillOval((int) location.point.x - 10, (int) location.point.y - 10, 20, 20);
+                    g.drawString("x" + Math.round(location.quality * 100), (int) location.point.x, (int) location.point.y);
                 } catch (Exception e) {
-                    println(e.getMessage() + "colorblue:" + (int) (Math.min(qual / (6 + 1 + 2 + 1), 1) * 255));
+                    println(e.getMessage() + "colorblue:" + (int) (Math.min(location.quality / (6 + 1 + 2 + 1), 1) * 255));
                 }
             }
-
         }
 
 
-        p1.goTo(bestd.x, bestd.y);
+        p1.goTo(best.point);
 
-        return bestd;
+        return best.point;
 
+    }
+
+    private double evaluateLocation(Player p1, P l1) {
+        double qual = 1;
+
+        for (Player o1 : opps) {
+            double diff = angle(o1, l1, ball);
+
+//				anywhere where closer to ball than enemy
+            qual += config.get(W.blocking) * diff / Math.PI;//*100/o1.distance(ball);
+
+        }
+
+        qual += config.get(W.locstability) * Math.max(0, 500 - p1.distance(l1)) / 500;
+
+//			depending on the distance to goal
+        qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(l1) / 500));
+
+
+        for (Player p2 : plays) {
+            if ((p2 == p1) || (p1 == pgo)) continue;
+            double diff = angle(p2, ball, l1);
+// to be in all directions around ball
+            qual *= (1 + config.get(W.repelency) * Math.min(diff / criticalangle, 1)) / (1 + config.get(W.repelency));
+        }
+        return qual;
     }
 
     public void paint(Graphics g) {

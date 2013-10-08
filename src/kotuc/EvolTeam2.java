@@ -15,7 +15,7 @@ public class EvolTeam2 extends BaseKotuczTeam {
 
     QualityPoint[] targets = new QualityPoint[30];
 
-    P[] locs = new P[30];
+    QualityPoint[] locs = new QualityPoint[30];
 
     boolean logsenabled = false;
 
@@ -158,65 +158,78 @@ public class EvolTeam2 extends BaseKotuczTeam {
         return qual;
     }
 
+    /**
+     * where players should go
+     */
     P position(Player p1) {
-        /**
-         * 	where players should go
-         *
-         */
-
-        double bestq = 0;
-        P bestd = null;
 
         for (int i = 0; i < locs.length; i++) {
-            P l1 = locs[i];
             //create new random
-            if (l1 == null) l1 = locs[i] = new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT);
-            double qual = 0;
-
-//			g.setColor(Color.RED);
-            for (Player o1 : opps) {
-                double diff = angle(o1, l1, ball);
-//				g.drawLine((int)ball.x, (int)ball.y, (int)o1.x, (int)o1.y);
-//				anywhere where closer to ball than enemy 
-                qual += config.get(W.blocking) * diff / Math.PI;//*100/o1.distance(ball);
-
+            if (locs[i] == null) {
+                locs[i] = new QualityPoint(new P(Math.random() * Pitch.WIDTH, Math.random() * Pitch.HEIGHT));
             }
 
+        }
 
-            for (Player p2 : plays) {
-                if (p2 == p1) continue;
-                qual += config.get(W.repelency) * Math.pow(Math.min(p2.distance(l1) / 500, 1), config.get(W.repelencyexp));
+        QualityPoint best = new QualityPoint();
+
+        for (QualityPoint location : locs) {
+
+            location.quality = evaluateLocation(p1, location.point);
+
+            if (location.quality > best.quality) {
+                best = location;
             }
+        }
 
-            qual += config.get(W.locstability) * Math.max(0, 500 - p1.distance(l1)) / 500;
-
-//			depending on the distance to goal        	
-            qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(l1) / 500));
-
-            if (qual > bestq) {
-                bestq = qual;
-                bestd = l1;
-            }
-
-            if (coolgraphics) {
+        if (coolgraphics) {
+            for (QualityPoint location : locs) {
                 try {
-                    g.setColor(new Color(0, 0, (int) (Math.min(qual / (14), 1) * 255)));
-                    g.fillOval((int) l1.x - 10, (int) l1.y - 10, 20, 20);
-                    g.drawString("x" + Math.round(qual * 100), (int) l1.x, (int) l1.y);
+                    g.setColor(new Color(0, 0, (int) (Math.min(location.quality / (14), 1) * 255)));
+                    g.fillOval((int) location.point.x - 10, (int) location.point.y - 10, 20, 20);
+                    g.drawString("x" + Math.round(location.quality * 100), (int) location.point.x, (int) location.point.y);
                 } catch (Exception e) {
-                    println(e.getMessage() + "colorblue:" + (int) (Math.min(qual / (6 + 1 + 2 + 1), 1) * 255));
+                    println(e.getMessage() + "colorblue:" + (int) (Math.min(location.quality / (6 + 1 + 2 + 1), 1) * 255));
                 }
             }
+        }
 
-            if (qual < config.get(W.toogoodloc))
-                if ((qual < config.get(W.toobadloc)) || (Math.random() < config.get(W.randomizingloc))) locs[i] = null;
+        for (int i = 0; i < locs.length; i++) {
+            QualityPoint location = locs[i];
+            if (location.quality < config.get(W.toogoodloc))
+                if ((location.quality < config.get(W.toobadloc)) || (Math.random() < config.get(W.randomizingloc)))
+                    locs[i] = null;
+        }
+
+        p1.goTo(best.point);
+
+        return best.point;
+
+    }
+
+    private double evaluateLocation(Player p1, P location) {
+        double qual = 0;
+
+//			g.setColor(Color.RED);
+        for (Player o1 : opps) {
+            double diff = angle(o1, location, ball);
+//				g.drawLine((int)ball.x, (int)ball.y, (int)o1.x, (int)o1.y);
+//				anywhere where closer to ball than enemy
+            qual += config.get(W.blocking) * diff / Math.PI;//*100/o1.distance(ball);
+
         }
 
 
-        p1.goTo(bestd.x, bestd.y);
+        for (Player p2 : plays) {
+            if (p2 == p1) continue;
+            qual += config.get(W.repelency) * Math.pow(Math.min(p2.distance(location) / 500, 1), config.get(W.repelencyexp));
+        }
 
-        return bestd;
+        qual += config.get(W.locstability) * Math.max(0, 500 - p1.distance(location)) / 500;
 
+//			depending on the distance to goal
+        qual += config.get(W.agresivityloc) * Math.max(0, (1 - new P((1 - getSideSign()) * Pitch.WIDTH / 2, Pitch.HEIGHT / 2).distance(location) / 500));
+        return qual;
     }
 
 
